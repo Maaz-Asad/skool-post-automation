@@ -1,0 +1,14 @@
+[
+  {
+    "date": "2026-06-18",
+    "category": "Newsletter",
+    "title": "Example scheduled post (edit or delete me)",
+    "content": "This is a template entry. The scheduled run posts the entry whose date matches today. Replace these with your real 30-day plan, one object per day."
+  },
+  {
+    "date": "2026-06-19",
+    "category": "Newsletter",
+    "title": "Second example post",
+    "content": "Add as many dated entries as you want. Each day's run looks up today's date and posts the matching entry. If no entry matches today, nothing is posted."
+  }
+]

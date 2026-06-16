@@ -1,0 +1,47 @@
+name: Skool post
+
+on:
+  # Scheduled daily run. NOTE: cron is in UTC, and GitHub may delay it a few minutes.
+  # Example below = 04:00 UTC. Change it to your local 9 AM in UTC (see README).
+  schedule:
+    - cron: "0 4 * * *"
+
+  # Manual run button (Actions tab -> this workflow -> "Run workflow").
+  # Leave inputs blank to post today's content.json entry; fill them to post a one-off now.
+  workflow_dispatch:
+    inputs:
+      title:
+        description: "Title (one-off post; leave blank to use content.json)"
+        required: false
+      content:
+        description: "Body (one-off post)"
+        required: false
+      category:
+        description: "Category"
+        required: false
+        default: "Newsletter"
+
+jobs:
+  post:
+    runs-on: ubuntu-latest
+    steps:
+      - uses: actions/checkout@v4
+
+      - uses: actions/setup-python@v5
+        with:
+          python-version: "3.12"
+
+      - name: Install dependencies
+        run: pip install -r requirements.txt
+
+      - name: Post to Skool
+        env:
+          APIFY_TOKEN: ${{ secrets.APIFY_TOKEN }}
+          SKOOL_EMAIL: ${{ secrets.SKOOL_EMAIL }}
+          SKOOL_PASSWORD: ${{ secrets.SKOOL_PASSWORD }}
+          GROUP_SLUG: ${{ secrets.GROUP_SLUG }}
+          TIMEZONE: "UTC"  # set to e.g. Asia/Karachi or America/New_York
+          POST_TITLE: ${{ github.event.inputs.title }}
+          POST_CONTENT: ${{ github.event.inputs.content }}
+          POST_CATEGORY: ${{ github.event.inputs.category }}
+        run: python post_runner.py
