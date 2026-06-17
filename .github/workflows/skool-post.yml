@@ -20,6 +20,10 @@ on:
         description: "Category"
         required: false
         default: "Newsletter"
+  push:
+    branches: [main]
+    paths:
+      - post_now.json
 
 jobs:
   post:
@@ -40,8 +44,9 @@ jobs:
           SKOOL_EMAIL: ${{ secrets.SKOOL_EMAIL }}
           SKOOL_PASSWORD: ${{ secrets.SKOOL_PASSWORD }}
           GROUP_SLUG: ${{ secrets.GROUP_SLUG }}
-          TIMEZONE: "UTC"  # set to e.g. Asia/Karachi or America/New_York
+          TIMEZONE: "Asia/Karachi"  # set to e.g. Asia/Karachi or America/New_York
           POST_TITLE: ${{ github.event.inputs.title }}
           POST_CONTENT: ${{ github.event.inputs.content }}
           POST_CATEGORY: ${{ github.event.inputs.category }}
+          EVENT_NAME: ${{ github.event_name }}
         run: python post_runner.py

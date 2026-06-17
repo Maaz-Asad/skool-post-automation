@@ -88,15 +88,28 @@ def create_post(cookies: str, title: str, content: str, label_id: str | None) ->
 
 # ── Decide what to post ────────────────────────────────────────────────────
 def pick_post():
-    # Manual dispatch inputs win.
+    event = os.environ.get("EVENT_NAME") or os.environ.get("GITHUB_EVENT_NAME") or ""
+
+    # On-demand: a commit to post_now.json publishes it immediately.
+    if event == "push":
+        try:
+            with open("post_now.json", encoding="utf-8") as f:
+                item = json.load(f)
+            print("Mode: on-demand (post_now.json).")
+            return item["title"], item["content"], item.get("category", "Newsletter")
+        except FileNotFoundError:
+            print("Push event but no post_now.json; nothing to do.")
+            return None
+
+    # Manual dispatch inputs.
     title = (os.environ.get("POST_TITLE") or "").strip()
     content = (os.environ.get("POST_CONTENT") or "").strip()
     category = (os.environ.get("POST_CATEGORY") or "").strip() or "Newsletter"
     if title and content:
-        print("Mode: manual (workflow_dispatch inputs).")
+        print("Mode: manual (workflow_dispatch).")
         return title, content, category
 
-    # Otherwise, today's scheduled entry from content.json.
+    # Scheduled: today's entry from content.json.
     today = datetime.now(ZoneInfo(TIMEZONE)).strftime("%Y-%m-%d")
     print(f"Mode: scheduled. Looking for entry dated {today} ({TIMEZONE}).")
     try:
